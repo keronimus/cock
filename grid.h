@@ -1,64 +1,67 @@
-#ifndef GRID_H
-#define GRID_H
+    #ifndef GRID_H
+    #define GRID_H
 
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include <cstdlib> // For rand() and srand()
-#include <ctime>   // For time()
+    #include <iostream>
+    #include <sstream>
+    #include <utility>
+    #include <string>
+    #include <iomanip>
+    #include "robot.h"
 
-using namespace std;
+    using namespace std;
 
-class Grid
-{
-public:
-    int rows;
-    int cols;
-    string grid[100][100]; // Grid size is fixed at 100x100
+    class Grid
+    {
+    public:
+        int rows;
+        int cols;
+        string grid[100][100]; // Grid size is fixed at 100x100
+        MovingRobot* robots[100]; // Fixed-size array for robots
+        int robotCount; // Counter for robots
 
-    Grid(int r, int c) : rows(r), cols(c) {
-        // Initialize the grid with empty values
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                grid[i][j] = "--";
+        Grid(int r, int c) : rows(r), cols(c), robotCount(0) {
+            // Initialize the grid with empty values
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    grid[i][j] = "--";
+                }
             }
+            // Initialize robot array
+            for (int i = 0; i < 100; i++) {
+                robots[i] = nullptr;
+            }
+        }
+
+        void addRobot(MovingRobot* robot) {
+        if (robotCount < 100) {
+            robots[robotCount++] = robot;
+            pair<int, int> pos = robot->getPos();
+            grid[pos.first][pos.second] = robot->getName(); // Set grid cell with robot's name
         }
     }
 
-    string showgrid() {
-        stringstream ss;
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                ss << setw(2) << grid[i][j] << ' ';
+
+        void moveRobotTurnBased(int robotIndex) {
+            MovingRobot* robot = robots[robotIndex];
+            if (robot) {
+                pair<int, int> oldPos = robot->getPos();
+                grid[oldPos.first][oldPos.second] = "--";
+                robot->randomMove(rows, cols);
+                pair<int, int> newPos = robot->getPos();
+                grid[newPos.first][newPos.second] = robot->getName();
             }
-            ss << '\n';
         }
-        return ss.str();
-    }
-};
 
-class insertRobot
-{
-public:
-    void insert(Grid& grid, int& row, int& col) {
-        srand(time(0)); // Initialize random number generator
+        string showgrid() {
+            stringstream ss;
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    ss << setw(2) << grid[i][j] << ' ';
+                }
+                ss << '\n';
+            }
+            return ss.str();
+        }
+    };
 
-        do {
-            row = rand() % grid.rows;
-            col = rand() % grid.cols;
-        } while (grid.grid[row][col] != "--");
-
-        grid.grid[row][col] = "R";
-    }
-};
-
-// Function to generate a random step
-void randomStep(int& x, int& y, int rows, int cols) {
-    int dx[] = {0, 0, 1, -1};
-    int dy[] = {1, -1, 0, 0};
-    int direction = rand() % 4;
-    x = (x + dx[direction] + rows) % rows;
-    y = (y + dy[direction] + cols) % cols;
-}
-
-#endif
+    #endif
