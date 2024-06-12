@@ -1,4 +1,3 @@
-// main.cpp
 #include <iostream>
 #include <cstdlib> // For rand()
 #include <ctime>   // For time()
@@ -10,10 +9,11 @@ using namespace std;
 int main()
 {
     int rows, cols;
-    cout << "rows :" << endl;
+    cout << "rows: ";
     cin >> rows;
-    cout << "cols :" << endl;
+    cout << "cols: ";
     cin >> cols;
+    
 
     Grid myGrid(rows, cols);
 
@@ -28,6 +28,10 @@ int main()
     insertRobot robotInserter;
     int robotRow, robotCol;
     robotInserter.insert(myGrid, robotRow, robotCol);
+
+    // Create a robot and set its position
+    RC myRobot("Robot1", robotRow, robotCol);
+    myRobot.move(robotRow, robotCol);
 
     // Display the grid
     cout << myGrid.showgrid() << endl;
